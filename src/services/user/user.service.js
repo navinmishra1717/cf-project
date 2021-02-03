@@ -1,5 +1,10 @@
 const User = require("../../models/user.model");
 
+/**
+ * Gets all users with given query
+ * @param {*} getQuery The object of queries to filter user
+ * @param {*} options other data passed
+ */
 function get(getQuery, options = {}) {
   const limit = options.limit || 100;
   const skip = limit * options.page || 0;
@@ -8,6 +13,7 @@ function get(getQuery, options = {}) {
     .limit(limit)
     .exec();
 }
+
 /**
  * Creates new user and returns user
  * @param {object} userData The object that contains information about user to be created
@@ -19,6 +25,7 @@ function create(userData) {
 
 /**
  * Updates user by given id and returns user
+ * @param {string} userId The string that represents the id of user
  * @param {object} userData The object that contains information about user to be created
  */
 function update(userId, userData) {
@@ -48,6 +55,7 @@ function findById(userId, options = {}) {
 /**
  * Removes user by given id
  * @param {string} userId The string which represents id of user
+ * @param {object} data The data passed to be modified
  */
 
 function deleteOne(userId, data) {
