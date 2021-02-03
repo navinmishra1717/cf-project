@@ -18,9 +18,10 @@ function get(getQuery, options = {}) {
  * Creates new user and returns user
  * @param {object} userData The object that contains information about user to be created
  */
-function create(userData) {
+function create(userData, options = {}) {
   const user = new User(userData);
-  return user.create();
+  model = options.mode === "test" ? options.model : user;
+  return model.create();
 }
 
 /**

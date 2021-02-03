@@ -1,4 +1,5 @@
 const userService = require("../../services/user/user.service");
+const userModel = require("../../models/user.model");
 const logger = require("../../commons/logger");
 const log = logger.log;
 const Response = require("../../commons/response");
@@ -29,14 +30,15 @@ async function getUsers(req, res, next) {
  */
 async function createUser(req, res, next) {
   let user = req.body;
+  let Service = req.mockFunction ? req.mockFunction : userService;
   try {
     log.info("creating new user");
     user.createdAt = Date.now();
     user.updatedAt = Date.now();
-    const newUser = await userService.create(user);
+    const newUser = await Service.create(user, userModel);
     const msg = "user created successfully";
     log.info(msg);
-    Response.successResponse(res, msg, newUser);
+    return Response.successResponse(res, msg, newUser);
   } catch (err) {
     log.error(err);
     next(err);
