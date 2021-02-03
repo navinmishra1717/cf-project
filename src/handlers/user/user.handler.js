@@ -1,7 +1,6 @@
 const userService = require("../../services/user/user.service");
 const logger = require("../../commons/logger");
 const log = logger.log;
-const redisHelper = require("../../commons/redisHelper");
 const Response = require("../../commons/response");
 
 /**
@@ -55,11 +54,14 @@ async function updateUser(req, res, next) {
   const userId = req.params.id;
   const updateData = req.body;
   try {
+    const isExistingUser = await userService.getOne(userId, {
+      isDeleted: false,
+    });
+    if (!isExistingUser) {
+      return Response.errorResponse(res, "user doesnot exists!!");
+    }
     log.info(`updating user with id:${userId}`);
     const newUser = await userService.update(userId, updateData);
-    // should update in cache too
-    redisHelper.unset(userId);
-    log.info(`Data updated in cache with key: ${userId}`);
     Response.successResponse(
       res,
       `update user success with id:${userId}`,
@@ -81,12 +83,10 @@ async function updateUser(req, res, next) {
 async function getOneById(req, res, next) {
   const id = req.params.id;
   try {
-    const user = await userService.getOne(id);
+    const query = { isDeleted: false };
+    const user = await userService.getOne(id, query);
     const msg = "Get user by id success!!";
     log.info(msg);
-    // store in redis cache
-    redisHelper.setObject(id, user);
-    log.info(`Data sent to store in redis cache with id: ${id}`);
     Response.successResponse(res, msg, user);
   } catch (err) {
     log.error(err);
@@ -103,24 +103,14 @@ async function getOneById(req, res, next) {
 
 async function deleteOne(req, res, next) {
   const userId = req.params.id;
-  let userData;
   try {
-    // check in cache first
-    if (req.userCache) {
-      userData = req.userCache;
-      log.info("data taken from cache");
-    } else {
-      userData = await userService.getOne(userId, { isDeleted: false });
-    }
+    const userData = await userService.getOne(userId, { isDeleted: false });
     if (!userData) {
       return Response.errorResponse(res, "user not found");
     }
     await userService.deleteOne(userId, userData);
     const msg = "Delete user by id success!!";
     log.info(msg);
-    // delete from cache too
-    redisHelper.unset(userId);
-    log.info(`Data deleted from cache with key: ${userId}`);
     Response.successResponse(res, msg);
   } catch (err) {
     log.error(err);
@@ -133,7 +123,7 @@ const userHandler = {
   createUser: createUser,
   updateUser: updateUser,
   getOneById: getOneById,
-  deleteOne: deleteOne
+  deleteOne: deleteOne,
 };
 
 module.exports = userHandler;
