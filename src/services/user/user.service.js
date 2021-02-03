@@ -5,10 +5,11 @@ const User = require("../../models/user.model");
  * @param {*} getQuery The object of queries to filter user
  * @param {*} options other data passed
  */
-function get(getQuery, options = {}) {
+function get(getQuery, model, options = {}) {
   const limit = options.limit || 100;
   const skip = limit * options.page || 0;
-  return User.find(getQuery)
+  return model
+    .find(getQuery)
     .skip(skip)
     .limit(limit)
     .exec();
@@ -18,10 +19,9 @@ function get(getQuery, options = {}) {
  * Creates new user and returns user
  * @param {object} userData The object that contains information about user to be created
  */
-function create(userData, options = {}) {
-  const user = new User(userData);
-  model = options.mode === "test" ? options.model : user;
-  return model.create();
+function create(userData, model, options = {}) {
+  const newModel = new model(userData);
+  return newModel.create();
 }
 
 /**
@@ -40,8 +40,8 @@ function update(userId, userData) {
  * @param {string} options The query passed for user search
  */
 
-function getOne(userId, options = {}) {
-  return User.findOne({ _id: userId, ...options }).exec();
+function getOne(userId, model, options = {}) {
+  return model.findOne({ _id: userId, ...options }).exec();
 }
 
 /**

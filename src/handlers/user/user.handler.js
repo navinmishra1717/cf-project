@@ -13,7 +13,7 @@ const Response = require("../../commons/response");
 async function getUsers(req, res, next) {
   try {
     let query = { isDeleted: false };
-    const users = await userService.get(query);
+    const users = await userService.get(query, userModel);
     log.info("Get users success");
     Response.successResponse(res, "Get users success", users);
   } catch (err) {
@@ -56,7 +56,7 @@ async function updateUser(req, res, next) {
   const userId = req.params.id;
   const updateData = req.body;
   try {
-    const isExistingUser = await userService.getOne(userId, {
+    const isExistingUser = await userService.getOne(userId, userModel, {
       isDeleted: false,
     });
     if (!isExistingUser) {
@@ -86,7 +86,7 @@ async function getOneById(req, res, next) {
   const id = req.params.id;
   try {
     const query = { isDeleted: false };
-    const user = await userService.getOne(id, query);
+    const user = await userService.getOne(id, userModel, query);
     const msg = "Get user by id success!!";
     log.info(msg);
     Response.successResponse(res, msg, user);
@@ -106,7 +106,9 @@ async function getOneById(req, res, next) {
 async function deleteOne(req, res, next) {
   const userId = req.params.id;
   try {
-    const userData = await userService.getOne(userId, { isDeleted: false });
+    const userData = await userService.getOne(userId, userModel, {
+      isDeleted: false,
+    });
     if (!userData) {
       return Response.errorResponse(res, "user not found");
     }
