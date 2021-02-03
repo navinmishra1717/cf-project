@@ -29,6 +29,7 @@ function update(userId, userData) {
 /**
  * Gets user by given query
  * @param {string} userId The string which represents id of user
+ * @param {string} options The query passed for user search
  */
 
 function getOne(userId, options = {}) {
@@ -61,7 +62,7 @@ const userService = {
   update,
   getOne,
   findById,
-  deleteOne
+  deleteOne,
 };
 
 module.exports = userService;

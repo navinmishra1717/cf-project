@@ -1,3 +1,6 @@
+/**
+ * DB connection function
+ */
 function connectDb(mongoose, config) {
   return mongoose.connect(config.db.MONGO_SERVER_CONN_STR, {
     autoReconnect: true,
@@ -7,7 +10,6 @@ function connectDb(mongoose, config) {
     keepAlive: 1,
     useNewUrlParser: true,
     useFindAndModify: false,
-    // useUnifiedTopology: true,
   });
 }
 
